@@ -17,11 +17,24 @@ const createPlan = async ({ body, headers }: Request, res: Response) => {
   if (isValid) {
     const key: string = `plan:${body.objectId}`;
     return redisClient
-      .set(key, JSON.stringify(body))
-      .then(() => {
-        return res.status(StatusCode.SuccessOK).json({
-          message: "Create plan successfully.",
-        });
+      .exists(key)
+      .then((result) => {
+        if (result)
+          return res.status(StatusCode.SuccessOK).json({
+            message: "Plan already exists.",
+          });
+        else
+          return redisClient
+            .set(key, JSON.stringify(body))
+            .then(() => {
+              return res.status(StatusCode.SuccessOK).json({
+                message: "Create plan successfully.",
+                data: body,
+              });
+            })
+            .catch((e) => {
+              throw e;
+            });
       })
       .catch((e) => {
         console.error(e);
