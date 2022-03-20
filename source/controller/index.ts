@@ -4,6 +4,11 @@ import { ajvErrorParser } from "../utils";
 import { StatusCode } from "status-code-enum";
 import { createClient } from "redis";
 import etag from "etag";
+import dotenv from "dotenv";
+import jwt, { Secret } from "jsonwebtoken";
+
+dotenv.config();
+const TOKEN_SECRET: Secret = process.env.TOKEN_SECRET || "token_secret";
 
 const redisClient = createClient();
 (async () => {
@@ -157,4 +162,41 @@ const deletePlans = async ({ body, headers }: Request, res: Response) => {
     });
 };
 
-export { createPlan, getPlan, getPlans, deletePlan, deletePlans };
+const getToken = (req: Request, res: Response) => {
+  const token = jwt.sign(
+    { username: "info7255-user", timestamp: new Date().toISOString },
+    TOKEN_SECRET,
+    { expiresIn: "6000s" }
+  );
+  return res.status(StatusCode.SuccessOK).json({
+    token,
+  });
+};
+const validateToken = ({ headers }: Request, res: Response) => {
+  const token = headers["authorization"]?.split("Bearer ")[1];
+
+  if (!token)
+    return res
+      .status(StatusCode.ClientErrorUnauthorized)
+      .json({ isValid: false });
+  else {
+    jwt.verify(token, TOKEN_SECRET, (err, decoded) => {
+      if (err) {
+        console.error(err);
+        return res
+          .status(StatusCode.ClientErrorUnauthorized)
+          .json({ isValid: false });
+      } else res.status(StatusCode.SuccessOK).json({ isValid: true });
+    });
+  }
+};
+
+export {
+  createPlan,
+  getPlan,
+  getPlans,
+  deletePlan,
+  deletePlans,
+  getToken,
+  validateToken,
+};

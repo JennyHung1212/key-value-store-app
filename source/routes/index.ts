@@ -5,6 +5,8 @@ import {
   getPlans,
   deletePlan,
   deletePlans,
+  getToken,
+  validateToken,
 } from "../controller";
 const router = express.Router();
 
@@ -13,5 +15,7 @@ router.get("/v1/plan", getPlans);
 router.get("/v1/plan/:id", getPlan);
 router.delete("/v1/plan", deletePlans);
 router.delete("/v1/plan/:id", deletePlan);
+router.get("/v1/token", getToken);
+router.post("/v1/validate", validateToken);
 
 export = router;
