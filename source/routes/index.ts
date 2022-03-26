@@ -5,6 +5,7 @@ import {
   getPlans,
   deletePlan,
   deletePlans,
+  updatePlan,
   getToken,
   validateToken,
 } from "../controller";
@@ -15,6 +16,7 @@ router.get("/v1/plan", getPlans);
 router.get("/v1/plan/:id", getPlan);
 router.delete("/v1/plan", deletePlans);
 router.delete("/v1/plan/:id", deletePlan);
+router.patch("/v1/plan/:id", updatePlan);
 router.get("/v1/token", getToken);
 router.post("/v1/validate", validateToken);
 
