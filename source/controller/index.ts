@@ -238,7 +238,7 @@ const updatePlan = async (
 
   const id: string = params.id;
   const key: string = constructObjectKey(id, OBJECT_TYPES.PLAN);
-  const ETag: string | undefined = headers["if-none-match"];
+  const ETag: string | undefined = headers["if-match"];
 
   await redisClient
     .exists(key)
@@ -264,7 +264,7 @@ const updatePlan = async (
       redisClient
     );
 
-    if (ETag === etag(JSON.stringify(fullPlan)))
+    if (ETag !== etag(JSON.stringify(fullPlan)))
       return res.status(StatusCode.ClientErrorPreconditionFailed).json();
 
     if (_org) plan._org = _org;
